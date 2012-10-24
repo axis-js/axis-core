@@ -27,7 +27,7 @@ module.exports = function(grunt) {
     }, 
     watch: {
       files: ['<config:jasmine.specs>','grunt.js', "src/**/*.js"],
-      tasks: 'clean copy replace lint jasmine'
+      tasks: 'copy replace lint jasmine'
     },
     replace: {
       target: {
