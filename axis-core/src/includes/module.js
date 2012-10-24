@@ -1,6 +1,6 @@
 // SCRIPT INJECTION
 // ---------------------------------------
-
+var document = global["document"];
 var scripts = {},
     documentHead = document != null && (document.head || document.getElementsByTagName('head')[0]);
     
@@ -51,13 +51,13 @@ xs.loadScript = function (url, attrs) {
             scripts[url] = script;
         }
     });
-}
+};
 
 // STACK Object
 // ---------------------------------------
 var Stack = function(){
     this.callbacks = [];
-}
+};
 
 Stack.prototype =
 {
@@ -89,7 +89,7 @@ var moduleMappings = {},
     pluginMappings = {};
 
 function resolveDependency(name) {    
-    if(name.trim().charAt(0) == "!") {
+    if(name.trim().charAt(0) === "!") {
         var dependency;
         
         $.each(pluginMappings, function(condition){
@@ -98,7 +98,7 @@ function resolveDependency(name) {
                 dependency = pluginMappings[condition].apply(xs.module, match);
                 return true; //break loop
             }
-        })
+        });
         
         if (dependency) {
             return dependency;
@@ -125,7 +125,9 @@ function circularDependencyCheck(dependencies, carry){
         
         return false;
     }
-    else return false;
+    else {
+        return false;
+    }
 }
 
 /**
@@ -175,11 +177,11 @@ var Module = function(name){
     this.errorStack = new Stack();
     
     this.statementStack = [];
-}
+};
 
 function resolveModuleFile(moduleName){
     var file;
-    if(typeof moduleName == "string"){
+    if(typeof moduleName === "string"){
         var basePath, finalPackage;
         for (var m in config.paths){
             if(moduleName.indexOf(m) === 0){
@@ -217,11 +219,11 @@ Module.prototype = (function(){
             var last = this.statementStack[this.statementStack.length-1],
                 lastRule = (last? statementRules[last.statement]: startStatements);
             
-            if(lastRule.indexOf(name) == -1) {
-                throw new Error("Invalid statement: after "
-                                 + (last? "." + last.statement + "()": "xs.module creation")
-                                 + " only the following statements are allowed: "
-                                 + (lastRule
+            if(lastRule.indexOf(name) === -1) {
+                throw new Error("Invalid statement: after " +
+                                 (last? "." + last.statement + "()": "xs.module creation") +
+                                 " only the following statements are allowed: " +
+                                 (lastRule
                                     .map(function(s){return "."+s+"()"})
                                     .join())
                                 );                
@@ -237,11 +239,11 @@ Module.prototype = (function(){
             this.statementStack.push({statement:name, args:args});
 
             return ret;
-        }
+        };
     }
             
     function dequeueStatement(targetModule) {
-        return targetModule.statementStack.pop()
+        return targetModule.statementStack.pop();
     }
     
     function isReady(targetModule){                
@@ -261,11 +263,11 @@ Module.prototype = (function(){
             targetModule.file = resolveModuleFile(targetModule.moduleName);
             var self = targetModule;
             xs.loadScript(targetModule.file).then(function(){            
-                self.fileLoaded = true
+                self.fileLoaded = true;
                 bootstrap(self);
             }).fail(function(){
-                throw new Error("Could not load the file: " + self.file 
-                                                + " for: " + self.moduleName);
+                throw new Error("Could not load the file: " + self.file +
+                                " for: " + self.moduleName);
             });
         }
     }
@@ -286,10 +288,10 @@ Module.prototype = (function(){
     }
 
     function resolveObject (source) {
-        if(typeof source == "function") {
-            return source.apply(this);
+        if(typeof source === "function") {
+            return source.call(global);
         }
-        else if (typeof source == "string"){
+        else if (typeof source === "string"){
             return xs.getNamespace(source);
         }
         else {
@@ -300,7 +302,7 @@ Module.prototype = (function(){
     function doSet(targetModule, namespace, implementation){
         queueExecution(targetModule, function(){
             xs.setNamespace(namespace, resolveObject(implementation), false);
-        })
+        });
     }
     
     function baseWrapClass(clss){
@@ -324,11 +326,11 @@ Module.prototype = (function(){
                     }
                 }
                 else{
-                    throw new Error("Class "+ clss["extend"] +" is not defined.")
+                    throw new Error("Class "+ clss["extend"] +" is not defined.");
                 }
             }
             else {
-                baseClass = Base
+                baseClass = Base;
             }
 
             definedClass = baseClass.extend(
@@ -404,7 +406,7 @@ Module.prototype = (function(){
                 if(!isReady(dependency)){
                     dependency.once("module:ready", function(){
                         bootstrap(self);
-                    })
+                    });
                     bootstrap(dependency);
                 }
             });
@@ -591,9 +593,9 @@ Module.prototype = (function(){
             var prev, done = false;
             while ( (prev = dequeueStatement(this)) && !done){                                
                 var prevst = prev.statement,
-                    clss = {}
+                    clss = {};
 
-                if(prevst == "set") {
+                if(prevst === "set") {
                     doSet(this, prev.args[0], arguments[0]);
                     done = true;
                 }
@@ -602,7 +604,7 @@ Module.prototype = (function(){
                                         clss[prevst].concat(prev.args)
                                         : prev.args;
                 } 
-                else if (prevst == "declare") {
+                else if (prevst === "declare") {
                     clss["name"] = prev.args[0];
                     clss["instance"] = arguments[0];
                     clss["static"] = arguments[1];
@@ -610,11 +612,11 @@ Module.prototype = (function(){
                     done = true;
                 }
                 else {
-                    throw new Error("Invalid xs.module declaration.")
+                    throw new Error("Invalid xs.module declaration.");
                 }
             }
         }))
-    }
+    };
     
 })();
 
@@ -650,7 +652,7 @@ xs.x(Module.prototype, Trigger);
           @as -> 1+1
           @execute -> doSomething()
     */
-    if(typeof fn == "function") {
+    if(typeof fn === "function") {
         fn.apply(instance);
     }
     
@@ -665,7 +667,7 @@ xs.x(xs.module, Trigger);
     xs.module[smt] = function() {
         var m = new xs.module();
         return m[smt].apply(m, arguments);
-    }
+    };
 });
 
 // Object Creation Listener
@@ -673,27 +675,28 @@ xs.x(xs.module, Trigger);
 var creationHooks = {};
 
 xs.module.objectCreated = function(object) {
+    /*jshint loopfunc:true */
     for (var type in creationHooks) {
         if (xs.typeOf(object, type)) {
             creationHooks[type].forEach(function(fn){
                 fn.call(object, object);
-            })
+            });
         }
     }
-}
+};
 
 xs.module.addCreationListener = function(type, fn) {
     creationHooks[type] = creationHooks[type] || [];
-    if(creationHooks[type].indexOf(fn) == -1) {
+    if(creationHooks[type].indexOf(fn) === -1) {
         creationHooks[type].push(fn); 
     }
-}
+};
 
 xs.module.removeCreationListener = function(type, fn) {
     if(creationHooks[type]) {
         if(fn) {
             var i;
-            if((i = creationHooks[type].indexOf(fn)) != -1) {
+            if((i = creationHooks[type].indexOf(fn)) !== -1) {
                 creationHooks[type].splice(i, 1);
             }
         }
@@ -701,12 +704,12 @@ xs.module.removeCreationListener = function(type, fn) {
             delete creationHooks[type];
         }
     }
-}
+};
 
 // Dependency plugin API
 xs.module.plugin = function(pattern, factory) {
     pluginMappings[pattern] = factory;
-}
+};
 
 // Base plugins
 xs.module.plugin("config", function(){
@@ -722,7 +725,7 @@ xs.module.plugin("config", function(){
         bootstrap: function(){
             
         }
-    }
+    };
 });
 
 xs.module.plugin("file:(.*)", function(file){

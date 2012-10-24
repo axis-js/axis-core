@@ -6,9 +6,9 @@ xs.request = xs.ajax = xs.fn($,"ajax");
 
 //UTIL: helper to create a specific ajax request
 function ajaxRequest(url, options, method) {
-    if(typeof url == "object") {
+    if(typeof url === "object") {
         options = url;
-        url = options.url
+        url = options.url;
     }
 
     var o = xs.x({
@@ -22,12 +22,12 @@ function ajaxRequest(url, options, method) {
 xs.request.GET = function(url, options) {
     return ajaxRequest(url, options, 'GET');
 };
-xs.request.POST = function(url, data, callback, type) {
+xs.request.POST = function(url, options) {
     return ajaxRequest(url, options, 'POST');
 };
-xs.request.PUT = function(url, data, callback, type) {
+xs.request.PUT = function(url, options) {
     return ajaxRequest(url, options, 'PUT');
 };
-xs.request.DELETE = function(url, data, callback, type) {
+xs.request.DELETE = function(url, options) {
     return ajaxRequest(url, options, 'DELETE');
 };

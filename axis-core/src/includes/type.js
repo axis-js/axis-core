@@ -4,8 +4,9 @@
 */
 
 xs.isArray = function (value) {
-    return value != null && Object.prototype.toString.call(value) == "[object Array]";
-}
+    return value != null && Object.prototype.toString.call(value) === "[object Array]";
+};
+
 /**
 * Array type enforcer. Performs operation on a given value to convert it into an array.
 * array -> array
@@ -18,16 +19,16 @@ xs.array = $.makeArray;
 
 xs.callback = function (source) {
     
-}
+};
 
 xs.single = function (source) {
     
-}
+};
 
 xs.number = function (source) {
     
-}
+};
 
 xs.string = function (source) {
     
-}
+};

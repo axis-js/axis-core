@@ -13,20 +13,22 @@ var UUID_ALPHABET= "0123456789abcdef";
 function returnEmpty(){return ""}
 
 function createExpando(obj) {
-    var expandoObj = {
-            toJSON:returnEmpty,
-            toString:returnEmpty
-        };
-    if(doesDefinePropertyWork){
-        obj!=undefined && Object.defineProperty(obj,xs.expando,{
-            value:expandoObj,
-            writable:false,
-            enumerable:false,
-            configurable:false
-        })
-    }
-    else{
-        obj!=undefined && (obj[xs.expando] = expandoObj);
+    if (obj != null) {
+        var expandoObj = {
+                toJSON:returnEmpty,
+                toString:returnEmpty
+            };
+        if (doesDefinePropertyWork) {
+             Object.defineProperty(obj,xs.expando,{
+                value:expandoObj,
+                writable:false,
+                enumerable:false,
+                configurable:false
+            });
+        }
+        else {
+            (obj[xs.expando] = expandoObj);
+        }
     }   
 }
     
@@ -40,12 +42,12 @@ xs.x(xs,{
     },
     
     data:function(obj, label, value){
-        if(typeof label == "object" || arguments.length > 2){
+        if(typeof label === "object" || arguments.length > 2){
             if(obj && !obj.hasOwnProperty(xs.expando)){                    
                 createExpando(obj);
             }
 
-            if(typeof label == "string") {
+            if(typeof label === "string") {
                 obj[xs.expando][label] = value;
             }
             else {
@@ -60,4 +62,4 @@ xs.x(xs,{
     }
 });
 
-xs.expando = "_xs" + xs.uuid()
+xs.expando = "_xs" + xs.uuid();

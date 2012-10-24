@@ -10,13 +10,13 @@ var dependencyDetection = {
         }
     },
     stop: function(){
-        enabled = false;
+        this.enabled = false;
         var captured = this.captured.slice();
         this.captured = [];
         
         return captured;
     }
-}
+};
 
 function createDispatcher() {
     var target = jQuery({});
@@ -24,7 +24,7 @@ function createDispatcher() {
         bind:$.proxy(target,"bind"),
         unbind:$.proxy(target,"unbind"),
         trigger:$.proxy(target,"trigger")
-    }
+    };
     return proxy;
 }
 
@@ -50,13 +50,13 @@ function prepareBindableArray(target, dataChanged, dispatcher){
 
         if(op){
             target[fn] = function(){
-                var args = jQuery.makeArray(arguments)
+                var args = jQuery.makeArray(arguments);
                 var old = Array.prototype.slice.call(target);
                 var ret = op.apply(target, args);
 
                 dataChanged(old,target,dispatcher);
                 return ret;
-            }
+            };
         }
     });
 }
@@ -93,7 +93,7 @@ xs.x(xs, /**@lends xs*/{
     bindable:function(init){
         var dispatcher = createDispatcher(),
             _value = init,
-            dataChanged = xs.desync(xs.fn(_dataChanged,this))
+            dataChanged = xs.desync(xs.fn(_dataChanged,this)),
             obserbable =  function (value){
                 if(arguments.length){
                    if(_value !== value){
@@ -112,7 +112,7 @@ xs.x(xs, /**@lends xs*/{
 
         obserbable.clone = function(){
             return xs.bindable(_value);
-        }
+        };
         
         return obserbable;
     },
@@ -160,7 +160,7 @@ xs.x(xs, /**@lends xs*/{
             _value = init.call(context);
         }
         catch(e){
-            console && console.log("WARNING: errors when evaluating dependencies for"+init.toString()+"please check is a propper getter with no side effects code.")
+            console.log("WARNING: errors when evaluating dependencies for"+init.toString()+"please check is a propper getter with no side effects code.");
         }
         var dependencies = dependencyDetection.stop();
 
@@ -169,10 +169,10 @@ xs.x(xs, /**@lends xs*/{
             var bound = _value;
             init = function(){
                 return bound.call(context);
-            }
+            };
         }
 
-        if(mandatory && dependencies.length == 0){
+        if(mandatory && dependencies.length === 0){
             return null;
         }
         
@@ -184,20 +184,20 @@ xs.x(xs, /**@lends xs*/{
                    _value = newValue;
                    dataChanged(old, newValue, dispatcher);
                 }
-            })
-        })
+            });
+        });
         
         var obserbable = function(){
             dependencyDetection.registerObserbableCall(dispatcher);                   
             return _value;
-        }
+        };
         
         xs.data(obserbable, "bindable", dispatcher);
         xs.data(init, "bindable", dispatcher);
 
         obserbable.clone = function(newContext){
             return xs.bindableComputed(init, newContext||context);
-        }
+        };
         
         return obserbable;
     },
@@ -253,7 +253,7 @@ xs.x(xs, /**@lends xs*/{
                 obserbable[fn] = function(){
                     dependencyDetection.registerObserbableCall(dispatcher);
                     return _value[fn].apply(_value, arguments);
-                }
+                };
             }
         });
 
@@ -262,12 +262,12 @@ xs.x(xs, /**@lends xs*/{
                 obserbable["r"+fn] = function(){
                     obserbable(_value[fn].apply(_value, arguments));
                     return obserbable;
-                }
+                };
             }
-        })
+        });
         
         obserbable["at"] = function(i, value){
-            if(arguments.length == 2){
+            if(arguments.length === 2){
                if(_value[i] !== value){
                   var old = Array.prototype.slice.call(_value);
                   _value[i] = value;
@@ -279,23 +279,23 @@ xs.x(xs, /**@lends xs*/{
             dependencyDetection.registerObserbableCall(dispatcher);
             
             return _value[i];
-        }
+        };
         
         obserbable["size"] = function(){
             dependencyDetection.registerObserbableCall(dispatcher);
             return _value.length;
-        }
+        };
 
         obserbable["isEmpty"] = function(){
             dependencyDetection.registerObserbableCall(dispatcher);
-            return _value.length == 0;
-        }
+            return _value.length === 0;
+        };
 
         xs.data(obserbable, "bindable", dispatcher);
 
         obserbable.clone = function(){
             return xs.bindableArray(_value);
-        }
+        };
         
         return obserbable;
     },
@@ -315,7 +315,7 @@ xs.x(xs, /**@lends xs*/{
             if(recursive && typeof value === "object"){
                 xs.bindableObject(value, recursive);
             }
-        })
+        });
         
         return obj;
     },
@@ -330,20 +330,19 @@ xs.x(xs, /**@lends xs*/{
         }
     },
 
-    unbindChanges: function(bindable, callback){
-        if(xs.isBindable(bindable)){
+    unbindChanges: function(target, callback){
+        if(xs.isBindable(target)){
             xs.data(target,"bindable").unbind("dataChanged", callback);
         }
     }
-})
+});
 
 //module.bindableComputed shorter alias
 xs.computed = xs.bindableComputed;
 
 function scopePrototypeBindables(instance) {
     for (var prop in instance) {
-        if(xs.isBindable(instance[prop])
-            && !instance.hasOwnProperty(prop)){
+        if(xs.isBindable(instance[prop]) && !instance.hasOwnProperty(prop)){
             instance[prop] = instance[prop].clone(instance);
         }
     }

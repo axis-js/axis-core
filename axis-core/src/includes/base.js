@@ -11,6 +11,7 @@ var Base = function() {
 };
 
 Base.extend = function(_instance, _static) { // subclass
+	/*jshint newcap:false supernew:true eqeqeq:false*/
 	var extend = Base.prototype.extend;
 	
 	// build the prototype
@@ -55,15 +56,18 @@ Base.extend = function(_instance, _static) { // subclass
 	};
 	extend.call(klass, _static);
 	// class initialisation
-	if (typeof klass.init == "function") klass.init();
+	if (typeof klass.init === "function") {
+		klass.init();
+	}
 	return klass;
 };
 
 Base.prototype = {	
 	extend: function(source, value) {
+		/*jshint eqeqeq:false */
 		if (arguments.length > 1) { // extending with a name/value pair
 			var ancestor = this[source];
-			if (ancestor && (typeof value == "function") && // overriding a method?
+			if (ancestor && (typeof value === "function") && // overriding a method?
 				// the valueOf() comparison is to avoid circular references
 				(!ancestor.valueOf || ancestor.valueOf() != value.valueOf()) &&
 				/\bbase\b/.test(value)) {
@@ -79,7 +83,7 @@ Base.prototype = {
 				};
 				// point to the underlying method
 				value.valueOf = function(type) {
-					return (type == "object") ? value : method;
+					return (type === "object") ? value : method;
 				};
 				value.toString = Base.toString;
 			}
@@ -94,16 +98,19 @@ Base.prototype = {
 			// do the "toString" and other methods manually
 			var hidden = ["constructor", "toString", "valueOf"];
 			// if we are prototyping then include the constructor
-			var i = Base._prototyping ? 0 : 1;
+			var i = Base._prototyping ? 0 : 1,
+				key;
+
 			while (key = hidden[i++]) {
 				if (source[key] != proto[key]) {
 					extend.call(this, key, source[key]);
-
 				}
 			}
 			// copy each of the source object's properties to this object
-			for (var key in source) {
-				if (!proto[key]) extend.call(this, key, source[key]);
+			for (key in source) {
+				if (!proto[key]) {
+					extend.call(this, key, source[key]);
+				}
 			}
 		}
 		return this;
@@ -129,7 +136,7 @@ Base = Base.extend({
 		
 	implement: function() {
 		for (var i = 0; i < arguments.length; i++) {
-			if (typeof arguments[i] == "function") {
+			if (typeof arguments[i] === "function") {
 				// if it's a function, call it
 				arguments[i](this.prototype);
 			} else {

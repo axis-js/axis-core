@@ -1,3 +1,4 @@
+"use strict";
 /**
  *@name xs.File
  *@class
@@ -75,7 +76,7 @@ module("xs.File")
                                 self.trigger("error");
                                 promise.reject("Could not retrieve file:" + fileUrl);
                             }
-                        })
+                        });
                     }
                 });
 
@@ -84,5 +85,5 @@ module("xs.File")
                 return promise;
             }
         }
-    }
-})
+    };
+});

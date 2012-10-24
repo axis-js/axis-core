@@ -2,24 +2,26 @@
 // ---------------------------------------
 
 // infer framework basepath as the location of xs.js
-var PATH_RX = /\/[^\/]*$/
+var PATH_RX = /\/[^\/]*$/;
 
 function inferBasePath(){
   var last = $("script").last()[0];
   if(last && last.src){
-    return last.src.split(PATH_RX,1).join()
+    return last.src.split(PATH_RX,1).join();
   }
-  else return global.location.href.split(PATH_RX,1).join()
+  else {
+    return global.location.href.split(PATH_RX,1).join();
+  }
 }
 
 function hasVariable(value) {
-    return value && value.trim().indexOf("<") == 0 && value.trim().indexOf(">") == (value.trim().length-1);
+    return value && value.trim().indexOf("<") === 0 && value.trim().indexOf(">") === (value.trim().length-1);
 }
 
 function resolveVariable (value) {
     var expr = value.trim().substring(1, value.trim().length-1),
         resolved = xs.get(expr, config) || xs.get(expr, global),
-        result = typeof resolved == "function"? 
+        result = typeof resolved === "function"? 
                     resolved.call(global)
                     :resolved;
 
@@ -29,10 +31,10 @@ function resolveVariable (value) {
 function processConfig (configObject) {
     for(var key in configObject){
         var value = configObject[key];
-        if(typeof value == "object") {
+        if(typeof value === "object") {
             processConfig(value);
         }
-        else if(typeof value == "string"){
+        else if(typeof value === "string"){
             if(hasVariable(value)){
                 configObject[key] = resolveVariable(value);
             }
@@ -79,7 +81,7 @@ xs.config = function(key, value) {
         // Getter
         return xs.get(key, config);
     }
-}
+};
 
 /**
  * Loads the configuration paramenters from a specified file or from an object.
@@ -99,28 +101,28 @@ xs.config = function(key, value) {
 xs.config.load = function(source) {
     configReady = false;
     if(source){
-        if(typeof config == "string"){
+        if(typeof config === "string"){
             xs.request({
                 url: source,
                 dataType:"json",
                 success:function(data){
                     xs.config.load(data);
-                    xs.trigger("config:ready")
+                    xs.trigger("config:ready");
                 }
-            })
+            });
         }
-        else if(typeof config == "object"){
+        else if(typeof config === "object"){
             xs.x(config, source);
             processConfig(config);
-            configReady = true
-            xs.trigger("config:ready")
+            configReady = true;
+            xs.trigger("config:ready");
         }
         else{
             throw new Error("Unsupported Config source type.");
         }
     }
     else{
-        configReady = true
-        xs.trigger("config:ready")
+        configReady = true;
+        xs.trigger("config:ready");
     }
-}
+};

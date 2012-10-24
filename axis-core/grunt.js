@@ -23,11 +23,11 @@ module.exports = function(grunt) {
   grunt.initConfig({
     clean: ["target/", "testTarget/", "_SpecRunner.html"],
     lint: {
-      files: ['grunt.js']//, 'src/**/*.js']
+      files: ['grunt.js', 'target/**/*.js']
     }, 
     watch: {
-      files: ['<config:jasmine.specs>','grunt.js'],
-      tasks: 'copy replace jasmine'
+      files: ['<config:jasmine.specs>','grunt.js', "src/**/*.js"],
+      tasks: 'clean copy replace lint jasmine'
     },
     replace: {
       target: {
@@ -74,9 +74,14 @@ module.exports = function(grunt) {
         boss: true,
         eqnull: true,
         node: true,
-        es5: true
+        es5: true,
+        lastsemic:true,
+        passfail:true
       },
       globals: {
+        window:false,
+        jQuery:false,
+        $:false,
         module:false,
         xs:false,
         jasmine : false,

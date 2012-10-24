@@ -1,3 +1,4 @@
+"use strict";
 module("xs.Prototype")
 .declare("xs.Prototype")
 .as({
@@ -15,32 +16,42 @@ module("xs.Prototype")
         if(typeAggregator){
             return typeAggregator(target,property);
         }
-        else return undefined;
+        else {
+            return undefined;
+        }
     },
     
     aggregators:{
-        "object": function(target,property){
-            var object = {};
-            var proto = Object.getPrototypeOf(target);
-            if(proto && proto !== Object.prototype){
-                object = arguments.callee(proto, property);
+        "object": (function () {            
+            function aggrgateObject(target, property){
+                var object = {};
+                var proto = Object.getPrototypeOf(target);
+                if(proto && proto !== Object.prototype){
+                    object = aggrgateObject(proto, property);
+                }
+                if(xs.typeOf(target[property],"object")){
+                    xs.x(true,object,target[property]);
+                }
+                return object;
             }
-            if(xs.typeOf(target[property],"object")){
-                xs.x(true,object,target[property]);
-            }
-            return object;
-        },
+
+            return aggrgateObject;
+        })(),
         
-        "array": function(target,property){
-            var array = [];
-            var proto = Object.getPrototypeOf(target);
-            if(proto !== Object.prototype){
-                array.push.apply(array, arguments.callee(proto, property));
+        "array": (function () {
+            function aggregateArray(target,property){
+                var array = [];
+                var proto = Object.getPrototypeOf(target);
+                if(proto !== Object.prototype){
+                    array.push.apply(array, aggregateArray(proto, property));
+                }
+                if( target && target.hasOwnProperty(property)) {
+                     array.push.apply(array, xs.array(target[property]));
+                }
+                return array;
             }
-            if( target && target.hasOwnProperty(property)) {
-                 array.push.apply(array, xs.array(target[property]));
-            }
-            return array;
-        }
+
+            return aggregateArray;
+        })()
     }
-})
+});

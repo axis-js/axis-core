@@ -38,7 +38,7 @@ xs.extend = xs.x = function() {
     $.extend.apply($, args);
     
     return returnObject;
-}
+};
 /**
  *  Select DOM element(s) matching a given selector.
  *  @see http://api.jquery.com/selector
@@ -46,7 +46,7 @@ xs.extend = xs.x = function() {
  */
 xs.query = xs.q = function(){
     return $.apply($, xs.array(arguments));
-}
+};
 
 /**
  * Borrowed from jQuery.proxy, scopes and/or curry a given function.
@@ -77,10 +77,12 @@ xs.proxied = xs.fn = $.proxy;
  * @alias xs.getNamespace
  **/
 xs.get = xs.getNamespace = function(namespace, context) {    
-    if(!namespace) return undefined;
-    
+    if(!namespace) {
+        return undefined;
+    }
+
     var path = string_split(namespace,".",2);
-    if(path.length == 1){
+    if(path.length === 1){
         return context[path[0]];
     }
     else{
@@ -92,7 +94,7 @@ xs.get = xs.getNamespace = function(namespace, context) {
             return undefined;
         }
     }
-}
+};
 
 /**
  * Set a reference in a context by providing its namespaced path.
@@ -116,35 +118,36 @@ xs.get = xs.getNamespace = function(namespace, context) {
 xs.set = xs.setNamespace = function(namespace, value, override, context) {
     context = context || global;  
     var path = string_split(namespace,".",2);
-    if(path.length == 1){
+    if(path.length === 1){
         if(context[path[0]] == null || override){
             context[path[0]] = value;
         }
         else{
-            throw new Error(path[0]+ " is already defined on "
-                                   + context
-                                   + ", use override flag to write over it.");
+            throw new Error(path[0] + 
+                            " is already defined on " + 
+                            context +
+                            ", use override flag to write over it.");
         }
     }
         
     else{
         var nextContext;
         if(context[path[0]] == null){
-            nextContext = context[path[0]] = {}
+            nextContext = context[path[0]] = {};
         }
         else{
             nextContext = context[path[0]];
         }
         xs.setNamespace(path[1], nextContext, value, override);
     }
-}
+};
 
 /**
  * Desynchronize a function, meaning the function wont execute as long as 
  * it keeps getting invoked, or it reaches a timeout.
  */
 xs.desync = function desync (fn, timeout){
-    timeout = (typeof timeout == "number")?timeout:1;
+    timeout = (typeof timeout === "number")?timeout:1;
     return function(){
         var args = arguments;
         var self = this;
@@ -153,10 +156,10 @@ xs.desync = function desync (fn, timeout){
         }
         fn.__desynced = setTimeout(function(){
             delete fn.__desynced;
-            fn.apply(self,args)
+            fn.apply(self,args);
         },timeout);
-    }
-}
+    };
+};
 
 /**
  * Gets a reference to a ceratin namespace object, if it doesn't exist yet, it
@@ -184,7 +187,7 @@ xs.ns = xs.namespace = function(namespace, context){
     }
         
     return target;
-}
+};
 
 /**
 * Returns a string from a i18n string bundle if the I18N module has been loaded,
@@ -198,7 +201,8 @@ xs.ns = xs.namespace = function(namespace, context){
 * @alias xs.getString
 */
 xs.str = xs.getString = function(key, defaultValue, env, namespace){
-    var currentLocale = xs.get("i18n.currentLocale");
+    var currentLocale = xs.get("i18n.currentLocale"),
+        string = "";
 
     if(currentLocale){
         string = currentLocale.localize(key, defaultValue, namespace);
@@ -208,7 +212,7 @@ xs.str = xs.getString = function(key, defaultValue, env, namespace){
     }
 
     return xs.template(string,env);
-}
+};
 
 /**
 * Get a registered path and append a relative url.
@@ -220,13 +224,13 @@ xs.str = xs.getString = function(key, defaultValue, env, namespace){
 */
 xs.path = xs.resolvePath = function(url, path){
     path = path || "basePath";
-    if(path=="basePath"){
+    if(path === "basePath"){
         return (config["basePath"]||"") + url;
     }
     else {
         return (config.paths[path] || "") + url;
     }
-}
+};
 
 /**
 * Register a basepath for an specific namespace prefix.
@@ -246,7 +250,7 @@ xs.path = xs.resolvePath = function(url, path){
 **/
 xs.registerPath = function(prefix, basepath){
     config.paths[prefix] = basepath;
-}
+};
 
 /**
 * Set the framework basePath, the path where all module files will be
@@ -261,7 +265,7 @@ xs.registerPath = function(prefix, basepath){
 **/
 xs.setBasePath = function(basepath){
     config.basepath = basepath;
-}
+};
 
 /**
  * Similar to $.extend, except yor can specify which properties you want to borrow.
@@ -271,27 +275,27 @@ xs.borrow = function(target, source, recursive, includes, excludes) {
 	if(target){
 		if($.isArray(source)){
 			source.forEach(function(nsource){
-				borrow(target,nsource,recursive,includes,excludes);
-			})
+				xs.borrow(target,nsource,recursive,includes,excludes);
+			});
 		}
 		else if(source){		
 			var included, excluded;
 			for (var prop in source) {
 				if(!includes) {
-				    included = true
+                    included = true;
 				}
 				else {
-				    included = $.isArray(includes)?
-						    includes.indexOf(prop)>-1
-						    :(includes === "*" || includes === prop);
+                    included = $.isArray(includes)?
+                            includes.indexOf(prop)>-1
+                            :(includes === "*" || includes === prop);
 				}
 				excluded = excludes && $.isArray(excludes)?
 							excludes.indexOf(prop)>-1
-							:(excludes === "*" || excludes === prop)
+							:(excludes === "*" || excludes === prop);
 				if (included && !excluded) {
 					if($.isPlainObject(source[prop]) && recursive) {
 						target[prop] = target[prop] || {};
-						borrow(target[prop],source[prop],true)
+						xs.borrow(target[prop],source[prop],true);
 					} else {
 						target[prop] = source[prop];
 					}
@@ -299,7 +303,7 @@ xs.borrow = function(target, source, recursive, includes, excludes) {
 			}
 		}
 	}
-}
+};
 
 /**
  * Make a function chained, meaning it always return a reference 
@@ -312,24 +316,28 @@ var chained = xs.chained = function (fn){
         if(ret != null){
             return ret;
         }
-        else return this;
-    }
-}
+        else {
+            return this;
+        }
+    };
+};
 
 
 function matchObjectMixin(obj, mixinName){
     var proto, mixins;
-    if(typeof obj == "object"){
+    if(typeof obj === "object"){
         if((mixins = xs.dataOwn(obj,"mixins"))){
             if(mixins.indexOf(mixinName) > -1){
-                return true
+                return true;
             }
         }
-        proto = Object.getPrototypeOf(obj)
-        if(proto && proto !== Object.prototype){
+        proto = Object.getPrototypeOf(obj);
+        if(proto && proto !== Object.prototype) {
             return matchObjectMixin(proto, mixinName);
         }
-        else return false;
+        else {
+            return false;
+        }
     }
     return false;
 }
@@ -359,20 +367,22 @@ function matchObjectMixin(obj, mixinName){
 **/
 xs.typeOf = function(obj, target){
     if(target) {        
-        if(typeof obj == "object") {
-            if (typeof target != "string") {
-                throw new Error("Unsupported target class type.")
+        if(typeof obj === "object") {
+            if (typeof target !== "string") {
+                throw new Error("Unsupported target class type.");
             }
             var targetClass = xs.get(target);                
             
             return (obj instanceof targetClass) ||  matchObjectMixin(obj, target);
         }
         else {
-            return typeof obj == target;
+            return typeof obj === target;
         }
     } 
-    else return false;
-}
+    else {
+        return false;
+    }
+};
 
 
 // DEFERRED UTILITIES
@@ -395,7 +405,7 @@ xs.when = $.when;
  */
 xs.promise = function (fn) {
     return xs.deferred(fn).promise();
-}
+};
 
 /**
  * Helper method that provides a literate api to better work with deferreds.
@@ -419,6 +429,6 @@ xs.do = function (fn) {
     return xs.promise(function(promise){
         fn.call(this, 
                 xs.fn(promise, "resolve"), 
-                xs.fn(promise, "reject"))
+                xs.fn(promise, "reject"));
     });
-}
+};
