@@ -7,6 +7,9 @@
     "name": "matix",
     "url": "http://github.com/matix"
   },
+  "files": [
+    "src", "test", "target", "grunt.js", "package.json", "README.md"
+  ],
   "licenses": [{
     "type": "Apache-2.0",
     "url": "http://www.apache.org/licenses/LICENSE-2.0"
@@ -23,7 +26,7 @@
     "node": ">= 0.6.0"
   },
   "scripts": {
-    "test": "grunt jasmine"
+    "test": "grunt test"
   },
   "devDependencies": {
     "grunt": "~0.3.15",

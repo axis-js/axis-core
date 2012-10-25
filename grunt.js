@@ -1,6 +1,9 @@
 "use strict";
 module.exports = function(grunt) {
-  var fs = require("fs");
+  var fs = require("fs"),
+      path = require("path");
+
+  var buildTasks = 'copy replace lint jasmine';      
 
   // Load local tasks.
   grunt.loadNpmTasks('grunt-contrib-clean');
@@ -8,12 +11,12 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-replace');
   
-  function getIncludes(){
+  function getIncludes(includesDir){
     var includes = {};
-    fs.readdirSync("src/includes/").filter(function (file) {
+    fs.readdirSync(includesDir).filter(function (file) {
       return file.indexOf(".js") === (file.length - 3);
     }).forEach(function (include) {
-      includes[include] = fs.readFileSync("src/includes/"+include).toString();
+      includes[include] = fs.readFileSync(path.resolve(includesDir,include)).toString();
     });
 
     return includes;
@@ -27,12 +30,12 @@ module.exports = function(grunt) {
     }, 
     watch: {
       files: ['<config:jasmine.specs>','grunt.js', "src/**/*.js"],
-      tasks: 'copy replace lint jasmine'
+      tasks: buildTasks
     },
     replace: {
       target: {
         options: {
-          variables: getIncludes(),
+          variables: getIncludes("src/includes/"),
           prefix: '//@@'
         },
         files: {
@@ -75,8 +78,7 @@ module.exports = function(grunt) {
         eqnull: true,
         node: true,
         es5: true,
-        lastsemic:true,
-        passfail:true
+        lastsemic:true
       },
       globals: {
         window:false,
@@ -95,7 +97,7 @@ module.exports = function(grunt) {
   });
 
   // Default task.
-  grunt.registerTask('default', 'copy replace lint jasmine');
-  grunt.registerTask('install', 'copy replace lint jasmine');
-
+  grunt.registerTask('default', buildTasks);
+  grunt.registerTask('install', buildTasks);
+  grunt.registerTask('test', 'copy replace jasmine');
 };
