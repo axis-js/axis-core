@@ -1,0 +1,10 @@
+{
+    "string":"string",
+    "number":123456789,
+    "array": [{}, 1, "", true],
+    "boolean":true,
+    "object": {
+        "key1":"value1",
+        "key2":"value2"
+    }
+}

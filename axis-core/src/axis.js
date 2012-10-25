@@ -18,6 +18,9 @@ if(!$) {
 
 var xs = global["xs"] = {};
 
+//private global
+var _ = {};
+
 //@@base.js
 //@@trigger.js
 //@@config.js

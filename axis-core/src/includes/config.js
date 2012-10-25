@@ -20,7 +20,7 @@ function hasVariable(value) {
 
 function resolveVariable (value) {
     var expr = value.trim().substring(1, value.trim().length-1),
-        resolved = xs.get(expr, config) || xs.get(expr, global),
+        resolved = xs.get(expr, _.config) || xs.get(expr, global),
         result = typeof resolved === "function"? 
                     resolved.call(global)
                     :resolved;
@@ -45,11 +45,11 @@ function processConfig (configObject) {
     }
 }
 
-var config = {
-        basePath: inferBasePath(),
-        paths:{}
-    },
-    configReady = true;
+//private config object
+_.config = {
+    basePath: inferBasePath(),
+    paths:{}
+};
 
 /**
  * Get/Sets a config variable value by providing its namespaced name.
@@ -68,18 +68,18 @@ xs.config = function(key, value) {
     if(key == null){
         // do not return reference config, only a copy
         var proxy = {};
-        xs.x(true, proxy, config);
+        xs.x(true, proxy, _.config);
         return proxy;
     }
     else{
         // Setter
         if(value != null){
             processConfig(value);
-            xs.set(key, value, config, true);
+            xs.set(key, value, _.config, true);
         }
         
         // Getter
-        return xs.get(key, config);
+        return xs.get(key, _.config);
     }
 };
 
@@ -88,9 +88,9 @@ xs.config = function(key, value) {
  * If this function is called, further operations in any module will be delayed
  * until the configuration variables are succesfully loaded.
  * @memberOf module
- * @param {string|object} source String indicating the location of
+ * @param {string|object|array} source(s) string indicating the location of
  * the configuration json file or a javascript object containing the
- * configuration parameters.
+ * configuration parameters, or an array of multiple sources to load.
  * @example
  * xs.config.load("path/to/config.json");
  *
@@ -98,31 +98,46 @@ xs.config = function(key, value) {
  *  // this will not be executed until the config file is succesfully retrieved.
  * })
  */
-xs.config.load = function(source) {
-    configReady = false;
-    if(source){
-        if(typeof config === "string"){
-            xs.request({
-                url: source,
-                dataType:"json",
-                success:function(data){
-                    xs.config.load(data);
-                    xs.trigger("config:ready");
+xs.config.load = function(source, override, supressEvents) {
+    return xs.do(function (done, fail) {
+        if(source){
+            if(typeof source === "string"){
+                return xs.request({
+                            url: source,
+                            dataType:"json"                    
+                        }).then(function (data) {
+                            return xs.config.load(data, override);
+                        });
+            }
+            else if(xs.isArray(source)){                
+                return xs.when.apply(null,source.map(function (sourceItem, i) {
+                    //pass override only to the first item being loaded
+                    //the rest will append to that first one.
+                    return xs.config.load(sourceItem, i===0 && override, true);
+                }));
+            }
+            else if(typeof source === "object"){
+                if(override) {
+                    _.config = source;
                 }
-            });
+                else {
+                    xs.x(_.config, source);
+                }            
+                processConfig(_.config);
+                done(xs.config());
+            }
+            else{
+                fail("Unsupported config source type.");
+            }
         }
-        else if(typeof config === "object"){
-            xs.x(config, source);
-            processConfig(config);
-            configReady = true;
+        else{            
+            fail("No config source provided.");
+        }        
+    }).then(function () {
+        if(!supressEvents){
             xs.trigger("config:ready");
         }
-        else{
-            throw new Error("Unsupported Config source type.");
-        }
-    }
-    else{
-        configReady = true;
-        xs.trigger("config:ready");
-    }
+    }).fail(function (error) {
+        throw new Error(error);
+    });
 };

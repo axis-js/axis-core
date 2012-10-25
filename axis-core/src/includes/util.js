@@ -225,10 +225,10 @@ xs.str = xs.getString = function(key, defaultValue, env, namespace){
 xs.path = xs.resolvePath = function(url, path){
     path = path || "basePath";
     if(path === "basePath"){
-        return (config["basePath"]||"") + url;
+        return (_.config["basePath"]||"") + url;
     }
     else {
-        return (config.paths[path] || "") + url;
+        return (_.config.paths[path] || "") + url;
     }
 };
 
@@ -249,7 +249,7 @@ xs.path = xs.resolvePath = function(url, path){
 * .execute(...)
 **/
 xs.registerPath = function(prefix, basepath){
-    config.paths[prefix] = basepath;
+    _.config.paths[prefix] = basepath;
 };
 
 /**
@@ -264,7 +264,7 @@ xs.registerPath = function(prefix, basepath){
 * @see module#require
 **/
 xs.setBasePath = function(basepath){
-    config.basepath = basepath;
+    _.config.basepath = basepath;
 };
 
 /**
@@ -427,8 +427,8 @@ xs.promise = function (fn) {
  */
 xs.do = function (fn) {
     return xs.promise(function(promise){
-        fn.call(this, 
-                xs.fn(promise, "resolve"), 
-                xs.fn(promise, "reject"));
+        return fn.call(this, 
+                    xs.fn(promise, "resolve"), 
+                    xs.fn(promise, "reject"));
     });
 };

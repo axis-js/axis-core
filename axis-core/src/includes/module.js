@@ -183,14 +183,14 @@ function resolveModuleFile(moduleName){
     var file;
     if(typeof moduleName === "string"){
         var basePath, finalPackage;
-        for (var m in config.paths){
+        for (var m in _.config.paths){
             if(moduleName.indexOf(m) === 0){
-                basePath = config.paths[m];
+                basePath = _.config.paths[m];
                 finalPackage = moduleName.substr(m.length);
             }
         }
 
-        basePath = basePath || config.basePath;
+        basePath = basePath || _.config.basePath;
         finalPackage = finalPackage || moduleName;
 
         var path = finalPackage.split(".").join("/");
