@@ -2,7 +2,7 @@
   "name": "axis-core",
   "version": "1.0.0",
   "description": "Axis Javascript Framework - Core Modules",
-  "homepage": "http://matix.github.com/axis",
+  "homepage": "https://github.com/axis-js",
   "author": {
     "name": "matix",
     "url": "http://github.com/matix"
@@ -16,10 +16,10 @@
   }],
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/axis-js/axis-core.git"
   },
   "bugs": {
-    "url": ""
+    "url": "https://github.com/axis-js/axis-core/issues"
   },
   "main": "target/axis.js",
   "engines": {
