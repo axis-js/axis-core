@@ -15,7 +15,7 @@ Its main objective is to enhance the experience of developing client-side applic
 Show me the code!
 -----------------
 
-### Dependency management: Module Sysytem.
+### Dependency management: Module System.
 ```javascript
 //scripts/my/super/Module.js
 
