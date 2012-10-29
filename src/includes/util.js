@@ -39,6 +39,7 @@ xs.extend = xs.x = function() {
     
     return returnObject;
 };
+
 /**
  *  Select DOM element(s) matching a given selector.
  *  @see http://api.jquery.com/selector
@@ -54,6 +55,10 @@ xs.query = xs.q = function(){
  * @alias xs.fn
  */
 xs.proxied = xs.fn = $.proxy;
+
+if(!xs.proxied) {
+    throw new Error("No proxy api present, most functionality will be unstable.");
+}
 
 /**
  * Get a reference to an object in a context by providing its namespaced path.
@@ -393,6 +398,10 @@ xs.typeOf = function(obj, target){
  * @see api.jquery.com/deferred
  */
 xs.deferred = $.Deferred;
+
+if(!xs.deferred) {
+    throw new Error("No deferred api present, most functionality will be unstable.");
+}
 
 /**
  * Check the completion of multiple deferreds, based on jQuery.when() method.
