@@ -1,13 +1,11 @@
 // ----------------------------------------------------------------------------
 // ########### AXIS CLIENT FRAMEWORK - AXIS.JS MICROFRAMEWORK ###############
 // ----------------------------------------------------------------------------
-"use strict";
-
-// Add polyfills to baseline browser javascript environment.
-//@@polyfill.js
 
 // make a closure to keep local variables private
 ;(function(global){
+
+'use strict';
 
 // INIT 
 // ---------------------------------------
@@ -16,7 +14,12 @@ if(!$) {
     throw new Error("No jQuery/Zepto library found.");
 }
 
+// Add polyfills to baseline browser javascript environment.
+//@@polyfill.js
+
 var xs = global["xs"] = {};
+
+xs.global = global;
 
 //private global
 var _ = {};
@@ -36,4 +39,4 @@ xs.x(xs, Trigger);
         
 // ---------------------------------------
 
-})(window);
+})(this);
