@@ -85,26 +85,9 @@ Stack.prototype =
 
 // xs.module API;
 // ---------------------------------------
-var moduleMappings = {},
-    pluginMappings = {};
+var moduleMappings = {};
 
 function resolveDependency(name) {    
-    if(name.trim().charAt(0) === "!") {
-        var dependency;
-        
-        $.each(pluginMappings, function(condition){
-            var match = new RegExp(condition).exec(name.substr(1));
-            if(match){
-                dependency = pluginMappings[condition].apply(xs.module, match);
-                return true; //break loop
-            }
-        });
-        
-        if (dependency) {
-            return dependency;
-        }
-    }
-    
     return xs.module(name);
 }
 
@@ -668,66 +651,4 @@ xs.x(xs.module, Trigger);
         var m = new xs.module();
         return m[smt].apply(m, arguments);
     };
-});
-
-// Object Creation Listener
-
-var creationHooks = {};
-
-xs.module.objectCreated = function(object) {
-    /*jshint loopfunc:true */
-    for (var type in creationHooks) {
-        if (xs.typeOf(object, type)) {
-            creationHooks[type].forEach(function(fn){
-                fn.call(object, object);
-            });
-        }
-    }
-};
-
-xs.module.addCreationListener = function(type, fn) {
-    creationHooks[type] = creationHooks[type] || [];
-    if(creationHooks[type].indexOf(fn) === -1) {
-        creationHooks[type].push(fn); 
-    }
-};
-
-xs.module.removeCreationListener = function(type, fn) {
-    if(creationHooks[type]) {
-        if(fn) {
-            var i;
-            if((i = creationHooks[type].indexOf(fn)) !== -1) {
-                creationHooks[type].splice(i, 1);
-            }
-        }
-        else {
-            delete creationHooks[type];
-        }
-    }
-};
-
-// Dependency plugin API
-xs.module.plugin = function(pattern, factory) {
-    pluginMappings[pattern] = factory;
-};
-
-// Base plugins
-xs.module.plugin("config", function(){
-    return {
-        retrieve: function(){
-
-        },
-
-        isReady: function() {
-
-        },
-
-        bootstrap: function(){
-            
-        }
-    };
-});
-
-xs.module.plugin("file:(.*)", function(file){
-    
 });

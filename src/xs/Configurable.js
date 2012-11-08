@@ -13,9 +13,4 @@ module("xs.Configurable")
 
         return xs.get(name, this.options);
     }
-})
-.execute(function(){
-    module.addCreationListener("xs.Configurable", function(object) {
-        object.options = object.prototypeAggregate("options","object");        
-    });
 });

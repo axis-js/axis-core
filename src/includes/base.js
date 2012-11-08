@@ -31,11 +31,6 @@ Base.extend = function(_instance, _static) { // subclass
 			if (this._constructing || this.constructor == klass) { // instantiation
 				this._constructing = true;
 				constructor.apply(this, arguments);
-                                xs.module.objectCreated(this);
-                                xs.module.trigger({
-                                    type: "object:created", 
-                                    object: this
-                                });
 				delete this._constructing;
 			} else if (arguments[0] != null) { // casting
 				return (arguments[0].extend || extend).call(arguments[0], proto);
