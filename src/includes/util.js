@@ -405,9 +405,19 @@ if(!xs.deferred) {
 
 /**
  * Check the completion of multiple deferreds, based on jQuery.when() method.
- * @see api.jquery.com/when
+ * xs.when() Supports passing an array of deferreds as first as unique argument.
+ * If more than one argument is passed, it will fallback to default behavior 
+ * regardless if the first argument is an array. 
+ * @see api.jquery.com/jQuery.when
  */
-xs.when = $.when;
+xs.when = function () {
+    if(arguments.length === 1 && xs.isArray(arguments[0])) {
+        $.when.apply(null, arguments[0]);
+    }
+    else {
+        $.when.apply(null, xs.array(arguments));
+    }
+};
 
 /**
  * Creates a deferred and automatically calls promise() on it to generate a promise object

@@ -110,7 +110,7 @@ xs.config.load = function(source, override, supressEvents) {
                         });
             }
             else if(xs.isArray(source)){                
-                return xs.when.apply(null,source.map(function (sourceItem, i) {
+                return xs.when(source.map(function (sourceItem, i) {
                     //pass override only to the first item being loaded
                     //the rest will append to that first one.
                     return xs.config.load(sourceItem, i===0 && override, true);
