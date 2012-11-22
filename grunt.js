@@ -3,7 +3,7 @@ module.exports = function(grunt) {
   var fs = require("fs"),
       path = require("path");
 
-  var buildTasks = 'copy replace lint jasmine';      
+  var buildTasks = 'replace lint jasmine';      
 
   // Load local tasks.
   grunt.loadNpmTasks('grunt-contrib-clean');
@@ -43,13 +43,13 @@ module.exports = function(grunt) {
         }
       }
     },
-    copy: {
+    /*copy: {
       target: {
         files: {
           "target/xs/": "src/xs/**"
         }
       }
-    },
+    },*/
     jasmine : {
       src : [
           "test/jquery-1.8.2.js",
@@ -99,5 +99,5 @@ module.exports = function(grunt) {
   // Default task.
   grunt.registerTask('default', buildTasks);
   grunt.registerTask('install', buildTasks);
-  grunt.registerTask('test', 'copy replace jasmine');
+  grunt.registerTask('test', 'replace jasmine');
 };

@@ -458,3 +458,51 @@ xs.do = function (fn, props) {
                     xs.fn(promise, "reject"));
     }, props);
 };
+
+/* Prototype Utils
+  ------------------------------------------------------
+*/
+
+/**
+* Traverses through the prototype chain of a given target object and aggregates 
+* the values for a given 
+*/
+xs.aggregate = xs.prototypeAggregate = function(target, property, type) {
+    type = type || "object";
+    var typeAggregator = xs.prototypeAggregate.aggregators[type];
+    return typeAggregator && typeAggregator(target,property);
+};
+    
+xs.prototypeAggregate.aggregators = {
+    "object": (function () {            
+        function aggrgateObject(target, property){
+            var object = {};
+            var proto = Object.getPrototypeOf(target);
+            if(proto && proto !== Object.prototype){
+                object = aggrgateObject(proto, property);
+            }
+            if(xs.typeOf(target[property],"object")){
+                xs.x(true,object,target[property]);
+            }
+            return object;
+        }
+
+        return aggrgateObject;
+    })(),
+    
+    "array": (function () {
+        function aggregateArray(target,property){
+            var array = [];
+            var proto = Object.getPrototypeOf(target);
+            if(proto !== Object.prototype){
+                array.push.apply(array, aggregateArray(proto, property));
+            }
+            if( target && target.hasOwnProperty(property)) {
+                 array.push.apply(array, $.makeArray(target[property]));
+            }
+            return array;
+        }
+
+        return aggregateArray;
+    })()
+};
