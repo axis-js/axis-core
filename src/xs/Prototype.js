@@ -46,7 +46,7 @@ module("xs.Prototype")
                     array.push.apply(array, aggregateArray(proto, property));
                 }
                 if( target && target.hasOwnProperty(property)) {
-                     array.push.apply(array, xs.array(target[property]));
+                     array.push.apply(array, $.makeArray(target[property]));
                 }
                 return array;
             }

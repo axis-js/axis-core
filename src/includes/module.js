@@ -62,7 +62,7 @@ var Stack = function(){
 Stack.prototype =
 {
     push: function(array){
-        var args = xs.array(array);
+        var args = $.makeArray(array);
         return this.callbacks.push.apply(this.callbacks, args);
     },
 
@@ -71,7 +71,7 @@ Stack.prototype =
     },
     
     execute: function(scope){
-        var args = xs.array(arguments);
+        var args = $.makeArray(arguments);
         this.callbacks.forEach(function (callback) {        
             callback.apply(scope,args);
         });

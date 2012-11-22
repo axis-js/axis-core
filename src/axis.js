@@ -28,7 +28,6 @@ var _ = {};
 //@@trigger.js
 //@@config.js
 //@@util.js
-//@@type.js
 //@@ajax.js
 //@@module.js
 //@@data.js

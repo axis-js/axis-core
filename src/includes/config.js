@@ -1,7 +1,7 @@
 // CONFIG
 // ---------------------------------------
 
-// infer framework basepath as the location of xs.js
+// infer framework basepath as the location of axis.js
 var PATH_RX = /\/[^\/]*$/;
 
 function inferBasePath(){
@@ -109,7 +109,7 @@ xs.config.load = function(source, override, supressEvents) {
                             return xs.config.load(data, override);
                         });
             }
-            else if(xs.isArray(source)){                
+            else if($.isArray(source)){                
                 return xs.when(source.map(function (sourceItem, i) {
                     //pass override only to the first item being loaded
                     //the rest will append to that first one.

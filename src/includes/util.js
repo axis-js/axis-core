@@ -25,17 +25,16 @@ function string_split(string, separator, count){
  * @alias xs.x
  */
 xs.extend = xs.x = function() {
-    var args = xs.array(arguments),
-        returnObject;
+    var returnObject;
 
-    if(typeof args[0] !== "boolean") {
-        returnObject = args[0];
+    if(typeof arguments[0] !== "boolean") {
+        returnObject = arguments[0];
     }
     else {
-        returnObject = args[1];
+        returnObject = arguments[1];
     }
 
-    $.extend.apply($, args);
+    $.extend.apply(null, $.makeArray(arguments));
     
     return returnObject;
 };
@@ -46,7 +45,7 @@ xs.extend = xs.x = function() {
  *  @alias xs.q
  */
 xs.query = xs.q = function(){
-    return $.apply($, xs.array(arguments));
+    return $.apply($, $.makeArray(arguments));
 };
 
 /**
@@ -392,16 +391,19 @@ xs.typeOf = function(obj, target){
 
 // DEFERRED UTILITIES
 // ----------------------------------------
+if(!$.Deferred) {
+    throw new Error("No deferred api present, most functionality will be unstable.");
+}
 
 /**
  * Creates a deferred object, based on jQuery.Deferred() method.
+ * 
  * @see api.jquery.com/deferred
  */
-xs.deferred = $.Deferred;
-
-if(!xs.deferred) {
-    throw new Error("No deferred api present, most functionality will be unstable.");
-}
+xs.deferred = function (fn, props) {
+    var def =  $.Deferred(fn);
+    return xs.x(def, props);
+};
 
 /**
  * Check the completion of multiple deferreds, based on jQuery.when() method.
@@ -411,32 +413,37 @@ if(!xs.deferred) {
  * @see api.jquery.com/jQuery.when
  */
 xs.when = function () {
-    if(arguments.length === 1 && xs.isArray(arguments[0])) {
-        $.when.apply(null, arguments[0]);
+    var def, args, props;
+    if(arguments.length <= 2 && $.isArray(arguments[0])) {
+        args = arguments[0];
+        props = arguments[1];        
     }
     else {
-        $.when.apply(null, xs.array(arguments));
+        args = $.makeArray(arguments);
+
+        if($.isPlainObject(args[args.length-1])){
+            props = args.pop();
+        }
     }
+
+    def = $.when.apply(null, args);
+
+    return xs.x(def, props);
 };
 
 /**
  * Creates a deferred and automatically calls promise() on it to generate a promise object
  */
-xs.promise = function (fn) {
-    return xs.deferred(fn).promise();
+xs.promise = function (fn, props) {
+    return xs.deferred(fn, props).promise();
 };
 
 /**
  * Helper method that provides a literate api to better work with deferreds.
  * @example
-   xs.do(function(done, fail, also){
+   xs.do(function(done, fail){
       //do something asynchornous...
       done()
-      // Pipe another condition:
-      also(function(done,fail, also){
-            ...
-            done() // done piped condition
-      })
       //error raised
       fail() 
    })
@@ -444,10 +451,10 @@ xs.promise = function (fn) {
      //do somtehing after the deferred...
    })
  */
-xs.do = function (fn) {
+xs.do = function (fn, props) {
     return xs.promise(function(promise){
         return fn.call(this, 
                     xs.fn(promise, "resolve"), 
                     xs.fn(promise, "reject"));
-    });
+    }, props);
 };
